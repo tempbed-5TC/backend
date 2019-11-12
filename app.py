@@ -4,8 +4,9 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
+from models import temperatures, engine
 
-
+import dateutil.parser
 
 app = Flask(__name__)
 with open("config.json") as fp :
@@ -16,16 +17,19 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
-@app.route("/api/v0.1/temperature", methods=['GET','PUT'])
-def temperature() :
+@app.route("/api/v0.1/temperature", methods=['GET', 'PUT'])
+def temperature():
     if request.method == 'PUT':
         tmps = request.json
-        id = tmps["sensor_id"]
+        sensor_id = tmps["sensor_id"]
         tmp = tmps["temperature"]
-        timestamp = tmps["timestamp"]
-        db(id,tmp,timestamp)
+        timestamp = dateutil.parser.parse(tmps["timestamp"])
+        conn = engine.connect()
+        conn.execute(temperatures.insert().values(sensor_id=sensor_id, temperature=tmp, timestamp=timestamp))
     else:
         return "Cette partie est en cours de réalisation !!!!"
+
+    return 'ok'
 
 if __name__ == '__main__':
     app.run()
