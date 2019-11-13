@@ -10,7 +10,7 @@ COPY ./entrypoint.sh /app/entrypoint.sh
 COPY ./app.py /app/app.py
 COPY ./manage.py /app/manage.py
 COPY ./config.json /app/config.json
-COPY ./conf.py /app/conf.py
+COPY ./config.py /app/config.py
 COPY ./models.py /app/models.py
 
 ENTRYPOINT ["sh"]
