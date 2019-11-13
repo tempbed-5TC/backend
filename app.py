@@ -17,6 +17,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+
 @app.route("/api/v0.1/temperature", methods=['GET', 'PUT'])
 def temperature():
     if request.method == 'PUT':
@@ -26,10 +27,15 @@ def temperature():
         timestamp = dateutil.parser.parse(tmps["timestamp"])
         conn = engine.connect()
         conn.execute(temperatures.insert().values(sensor_id=sensor_id, temperature=tmp, timestamp=timestamp))
+        return 'ok'
+    elif request.method == 'GET':
+        conn = engine.connect()
+        r = conn.execute(temperatures.select())
+        return {'temperatures': list(r)}
+
     else:
         return "Cette partie est en cours de réalisation !!!!"
 
-    return 'ok'
 
 if __name__ == '__main__':
     app.run()
